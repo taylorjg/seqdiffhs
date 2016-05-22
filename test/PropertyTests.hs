@@ -1,21 +1,17 @@
 import Test.QuickCheck
 import Test.QuickCheck.Test
-import SeqDiff
 import System.Exit (exitFailure)
+import SeqDiff
+import PropTestData
+import ArbitraryPropTestData
 
-prop_True1 :: Int -> Bool
-prop_True1 _ = True
-
-prop_True2 :: Int -> Bool
-prop_True2 n = if n > 10 then False else True
+prop_PropTestData :: PropTestData -> Bool
+prop_PropTestData _ = True
 
 main :: IO ()
 main = do
     let args = stdArgs {chatty = True, maxSuccess = 500}
-    let tests = [
-            quickCheckWithResult args prop_True1,
-            quickCheckWithResult args prop_True2
-            ]
+    let tests = [verboseCheckWithResult args prop_PropTestData]
     results <- sequence tests
     if all isSuccess results
         then return ()

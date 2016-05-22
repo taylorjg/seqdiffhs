@@ -1,7 +1,7 @@
 module SeqDiff (
     diffs,
     DiffType,
-    Diff
+    Diff(..)
 ) where
 
 data DiffType = Duplicate | Missing deriving Show
