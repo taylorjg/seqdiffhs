@@ -1,6 +1,6 @@
 module SeqDiff (
     diffs,
-    DiffType,
+    DiffType(..),
     Diff(..)
 ) where
 
