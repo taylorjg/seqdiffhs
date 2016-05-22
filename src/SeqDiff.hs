@@ -27,7 +27,7 @@ loop xs ev rc =
                     (Nothing, Just d2) -> d2 : ds
                     (Nothing, Nothing) -> ds
         [] ->
-            if (rc > 0) then return $ makeDuplicate (pred ev) rc else []
+            if (rc > 0) then [makeDuplicate (pred ev) rc] else []
 
 makeDuplicate :: Int -> Int -> Diff
 makeDuplicate v c = Diff {diffType = Duplicate, value = v, count = c}
