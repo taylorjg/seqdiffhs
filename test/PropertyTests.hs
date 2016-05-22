@@ -6,7 +6,12 @@ import PropTestData
 import ArbitraryPropTestData
 
 prop_PropTestData :: PropTestData -> Bool
-prop_PropTestData _ = True
+prop_PropTestData ptd =
+    actual == expected
+    where
+        expected = allDiffs ptd
+        actual = diffs xs
+        xs = toList ptd
 
 main :: IO ()
 main = do

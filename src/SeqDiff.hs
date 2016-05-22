@@ -4,8 +4,8 @@ module SeqDiff (
     Diff(..)
 ) where
 
-data DiffType = Duplicate | Missing deriving Show
-data Diff = Diff { diffType :: DiffType, value :: Int, count :: Int } deriving Show
+data DiffType = Duplicate | Missing deriving (Show, Eq)
+data Diff = Diff { diffType :: DiffType, value :: Int, count :: Int } deriving (Show, Eq)
 
 diffs :: [Int] -> [Diff]
 diffs xs = loop xs 0 0
