@@ -5,18 +5,13 @@ import SeqDiff
 import PropTestData
 import ArbitraryPropTestData
 
-prop_PropTestData :: PropTestData -> Bool
-prop_PropTestData ptd =
-    actual == expected
-    where
-        expected = allDiffs ptd
-        actual = diffs xs
-        xs = toList ptd
+prop_Diffs :: PropTestData -> Bool
+prop_Diffs ptd = diffs (toList ptd) == allDiffs ptd
 
 main :: IO ()
 main = do
-    let args = stdArgs {chatty = True, maxSuccess = 5}
-    let tests = [verboseCheckWithResult args prop_PropTestData]
+    let args = stdArgs {chatty = True, maxSuccess = 100}
+    let tests = [verboseCheckWithResult args prop_Diffs]
     results <- sequence tests
     if all isSuccess results
         then return ()
