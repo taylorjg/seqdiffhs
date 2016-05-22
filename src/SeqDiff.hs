@@ -8,10 +8,7 @@ data DiffType = Duplicate | Missing deriving Show
 data Diff = Diff { diffType :: DiffType, value :: Int, count :: Int } deriving Show
 
 diffs :: [Int] -> [Diff]
-diffs xs = loop xs expectedValue repeatCount
-    where
-        expectedValue = 0
-        repeatCount = 0
+diffs xs = loop xs 0 0
 
 loop :: [Int] -> Int -> Int -> [Diff]
 loop xs ev rc =
