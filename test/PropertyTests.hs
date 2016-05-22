@@ -12,8 +12,11 @@ prop_True2 n = if n > 10 then False else True
 main :: IO ()
 main = do
     let args = stdArgs {chatty = True, maxSuccess = 500}
-    r1 <- quickCheckWithResult args prop_True1
-    r2 <- quickCheckWithResult args prop_True2
-    if all isSuccess [r1, r2]
+    let tests = [
+            quickCheckWithResult args prop_True1,
+            quickCheckWithResult args prop_True2
+            ]
+    results <- sequence tests
+    if all isSuccess results
         then return ()
         else exitFailure
