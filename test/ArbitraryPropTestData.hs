@@ -1,4 +1,4 @@
-module ArbitraryPropTestData where
+module ArbitraryPropTestData () where
 
 import Test.QuickCheck
 import PropTestData
