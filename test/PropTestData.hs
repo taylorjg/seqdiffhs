@@ -26,46 +26,44 @@ toList ptd = xs' >>= addDups
 allDiffs :: PropTestData -> [Diff]
 allDiffs ptd = sortOn (\a -> value a) $ concat [(ds ptd), (ms ptd)]
 
-allDuplicateValues :: PropTestData -> [Int]
-allDuplicateValues ptd = (ds ptd) >>= (\d -> replicate (count d) (value d))
-
-allMissingValues :: PropTestData -> [Int]
-allMissingValues ptd = (ms ptd) >>= (\d -> take (count d) [(value d)..])
-
 isValid :: PropTestData -> Bool
 isValid ptd =
     and $ map ($ ptd) checks
     where checks = [
-            allDuplicateDiffValuesAreWithinRange,
             allMissingDiffValuesAreWithinRange,
+            allDuplicateDiffValuesAreWithinRange,
             noDuplicateDiffsForTheSameValue,
             noRunsOfMissingValuesOverlap,
+            noRunsOfMissingValuesAdjoin,
             noDuplicateDiffsAndMissingDiffsIntersect,
-            lastValueInSequenceIsNotMissing
-            ]
+            lastValueInSequenceIsNotMissing]
 
-allDuplicateDiffValuesAreWithinRange :: PropTestData -> Bool
 allDuplicateDiffValuesAreWithinRange ptd =
     and $ map (< len ptd) (allDuplicateValues ptd)
 
-allMissingDiffValuesAreWithinRange :: PropTestData -> Bool
 allMissingDiffValuesAreWithinRange ptd =
     and $ map (< len ptd) (allMissingValues ptd)
 
-noDuplicateDiffsForTheSameValue :: PropTestData -> Bool
 noDuplicateDiffsForTheSameValue ptd =
     nub vs == vs
     where vs = map (\d -> value d) $ ds ptd
 
-noRunsOfMissingValuesOverlap :: PropTestData -> Bool
 noRunsOfMissingValuesOverlap ptd =
     (nub $ allMissingValues ptd) == allMissingValues ptd
 
-noDuplicateDiffsAndMissingDiffsIntersect :: PropTestData -> Bool
+noRunsOfMissingValuesAdjoin ptd =
+    not $ any adjoin (ms ptd)
+    where
+        adjoin d1 = any (\d2 -> value d2 == value d1 + count d1) (others d1)
+        others d = filter (/=d) $ ms ptd
+
 noDuplicateDiffsAndMissingDiffsIntersect ptd =
     null $ intersect (allMissingValues ptd) (allDuplicateValues ptd)
 
-lastValueInSequenceIsNotMissing :: PropTestData -> Bool
 lastValueInSequenceIsNotMissing ptd =
     lastValue `notElem` allMissingValues ptd
     where lastValue = (len ptd) - 1
+
+allDuplicateValues ptd = (ds ptd) >>= (\d -> replicate (count d) (value d))
+
+allMissingValues ptd = (ms ptd) >>= (\d -> take (count d) [(value d)..])
