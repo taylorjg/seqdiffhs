@@ -8,7 +8,7 @@ module PropTestData (
 ) where
 
 import SeqDiff
-import Data.List (sortOn, (\\))
+import Data.List (sortOn, (\\), nub)
 
 data PropTestData = PropTestData {
     len :: Int,
@@ -35,4 +35,23 @@ allMissingValues :: PropTestData -> [Int]
 allMissingValues ptd = (ms ptd) >>= (\d -> take (count d) [(value d)..])
 
 isValid :: PropTestData -> Bool
-isValid ptd = True
+isValid ptd =
+    and $ map ($ ptd) checks
+    where checks = [
+            allDuplicateDiffValuesAreWithinRange,
+            allMissingDiffValuesAreWithinRange,
+            noDuplicateDiffsForTheSameValue
+            ]
+
+allDuplicateDiffValuesAreWithinRange :: PropTestData -> Bool
+allDuplicateDiffValuesAreWithinRange ptd =
+    and $ map (< len ptd) (allDuplicateValues ptd)
+
+allMissingDiffValuesAreWithinRange :: PropTestData -> Bool
+allMissingDiffValuesAreWithinRange ptd =
+    and $ map (< len ptd) (allMissingValues ptd)
+
+noDuplicateDiffsForTheSameValue :: PropTestData -> Bool
+noDuplicateDiffsForTheSameValue ptd =
+    nub vs == vs
+    where vs = map (\d -> value d) $ ds ptd
