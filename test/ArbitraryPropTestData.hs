@@ -25,14 +25,15 @@ genMissingDiffs = genDiffs Missing
 
 genDiffs :: DiffType -> Int -> Gen [Diff]
 genDiffs dt n = do
-    let lastValue = n - 1
     let tenthOfN = floor $ (realToFrac n) / 10
     numValues <- choose (0, tenthOfN)
+    let lastValue = if (n > 0) then n - 1 else 0
     values <- vectorOf numValues $ choose (0, lastValue)
     counts <- vectorOf numValues $ choose (1, 5)
     let vcs = zip values counts
     let ds = map (\(v, c) -> Diff {diffType = dt, value = v, count = c}) vcs
-    return $ sortOn (\d -> (value d)) ds
+    let ds' = sortOn (\d -> (value d)) ds
+    return ds'
 
 shrinkPropTestData :: PropTestData -> [PropTestData]
 shrinkPropTestData ptd = []

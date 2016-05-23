@@ -11,7 +11,7 @@ prop_Diffs ptd = diffs (toList ptd) == allDiffs ptd
 main :: IO ()
 main = do
     let args = stdArgs {chatty = True, maxSuccess = 100}
-    let tests = [verboseCheckWithResult args prop_Diffs]
+    let tests = [quickCheckWithResult args prop_Diffs]
     results <- sequence tests
     if all isSuccess results
         then return ()
