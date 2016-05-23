@@ -2,8 +2,6 @@ module PropTestData (
     PropTestData(..),
     toList,
     allDiffs,
-    allDuplicateValues,
-    allMissingValues,
     isValid
 ) where
 
