@@ -4,15 +4,15 @@ import Test.QuickCheck
 import PropTestData
 import SeqDiff
 import Data.List (sortOn)
-import Data.Bits (shiftR)
 
 genPropTestData :: Gen PropTestData
-genPropTestData = do
-    len <- genSequenceLength
-    ds <- genDuplicateDiffs len
-    ms <- genMissingDiffs len
-    let ptd = PropTestData {len = len, ds = ds, ms = ms}
-    return ptd
+genPropTestData = suchThat gen isValid
+    where
+    gen = do
+        len <- genSequenceLength
+        ds <- genDuplicateDiffs len
+        ms <- genMissingDiffs len
+        return PropTestData {len = len, ds = ds, ms = ms}
 
 genSequenceLength :: Gen Int
 genSequenceLength = choose (0, 100)
