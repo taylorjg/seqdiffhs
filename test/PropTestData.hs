@@ -12,7 +12,13 @@ data PropTestData = PropTestData {
     len :: Int,
     ds :: [Diff],
     ms :: [Diff]
-} deriving Show
+}
+
+instance Show PropTestData where
+    show ptd =
+        "SequenceLength: " ++ show (len ptd) ++ "; " ++
+        "DuplicateDiffs: " ++ show (ds ptd) ++ "; " ++
+        "MissingDiffs: " ++ show (ms ptd)
 
 toList :: PropTestData -> [Int]
 toList ptd = xs' >>= addDups
@@ -34,7 +40,7 @@ isValid ptd =
             allDuplicateDiffValuesAreWithinRange,
             noDuplicateDiffsForTheSameValue,
             noRunsOfMissingValuesOverlap,
-            noRunsOfMissingValuesAdjoin,
+            -- noRunsOfMissingValuesAdjoin,
             noDuplicateDiffsAndMissingDiffsIntersect,
             lastValueInSequenceIsNotMissing]
 
