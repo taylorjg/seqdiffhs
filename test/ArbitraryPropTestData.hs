@@ -37,28 +37,22 @@ genDiffs dt n = do
 
 shrinkPropTestData :: PropTestData -> [PropTestData]
 shrinkPropTestData ptd = concatMap ($ ptd) [
-    shrinkDuplicateDiffsList,
-    shrinkMissingDiffsList,
-    shrinkDuplicateDiffsCounts,
-    shrinkMissingDiffsCounts,
+    shrinkDuplicateDiffs,
+    shrinkMissingDiffs,
     shrinkSequenceLength
     ]
 
-shrinkDuplicateDiffsList ptd =
+shrinkDuplicateDiffs ptd =
     filter isValidShrink $ map makePropTestData shrinks
     where
         makePropTestData ds = ptd {ds = ds}
         shrinks = shrink (ds ptd)
 
-shrinkMissingDiffsList ptd =
+shrinkMissingDiffs ptd =
     filter isValidShrink $ map makePropTestData shrinks
     where
         makePropTestData ms = ptd {ms = ms}
         shrinks = shrink (ms ptd)
-
-shrinkDuplicateDiffsCounts ptd = []
-
-shrinkMissingDiffsCounts ptd = []
 
 shrinkSequenceLength ptd =
     take 1 $ filter isValidShrink $ map makePropTestData $ reverse [0..len ptd - 1]
@@ -72,4 +66,4 @@ instance Arbitrary PropTestData where
 
 instance Arbitrary Diff where
     arbitrary = return Diff {diffType = Duplicate, value = 0, count = 0}
-    shrink = \_ -> []
+    shrink = \d -> if (count d > 1) then [d {count = count d - 1}] else []
