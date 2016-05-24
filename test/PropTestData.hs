@@ -40,7 +40,7 @@ isValid ptd =
             allDuplicateDiffValuesAreWithinRange,
             noDuplicateDiffsForTheSameValue,
             noRunsOfMissingValuesOverlap,
-            -- noRunsOfMissingValuesAdjoin,
+            noRunsOfMissingValuesAdjoin,
             noDuplicateDiffsAndMissingDiffsIntersect,
             lastValueInSequenceIsNotMissing]
 
