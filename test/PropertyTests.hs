@@ -17,7 +17,7 @@ main :: IO ()
 main = do
     let args = stdArgs {chatty = True, maxSuccess = 100}
     let tests = [
-            verboseCheckWithResult args prop_diffs
+            quickCheckWithResult args prop_diffs
             ]
     results <- sequence tests
     if all isSuccess results

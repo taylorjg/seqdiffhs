@@ -53,7 +53,7 @@ shrinkSequenceLength ptd =
     take 1 $ filter isValidShrink $ map makePropTestData $ reverse [0..len ptd - 1]
     where makePropTestData len = ptd {len = len}
 
-isValidShrink ptd = isValid ptd && (not $ null $ allDiffs ptd)
+isValidShrink ptd = isValid ptd && not (null $ allDiffs ptd)
 
 genDiff :: Gen Diff
 genDiff = do
@@ -63,7 +63,7 @@ genDiff = do
     return Diff {diffType = dt, value = v, count = c}
 
 shrinkDiff :: Diff -> [Diff]
-shrinkDiff d = if (count d > 1) then [d {count = count d - 1}] else []
+shrinkDiff d = [d {count = count d - 1} | count d > 1]
 
 instance Arbitrary PropTestData where
     arbitrary = genPropTestData
