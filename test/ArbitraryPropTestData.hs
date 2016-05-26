@@ -10,30 +10,24 @@ genPropTestData = suchThat gen isValid
     where
     gen = do
         len <- genSequenceLength
-        ds <- genDuplicateDiffs len
-        ms <- genMissingDiffs len
+        diffs <- genDiffs
+        let ds = fst diffs
+        let ms = snd diffs
         return PropTestData {len = len, ds = ds, ms = ms}
 
 genSequenceLength :: Gen Int
 genSequenceLength = choose (0, 100)
 
-genDuplicateDiffs :: Int -> Gen [Diff]
-genDuplicateDiffs = genDiffs Duplicate
+genDiffs :: Gen ([Diff], [Diff])
+genDiffs = do
+    numDiffs <- genNumDiffs
+    diffs <- vectorOf numDiffs genDiff
+    let ds = filter (\d -> diffType d == Duplicate) diffs
+    let ms = filter (\d -> diffType d == Missing) diffs
+    return (ds, ms)
 
-genMissingDiffs :: Int -> Gen [Diff]
-genMissingDiffs = genDiffs Missing
-
-genDiffs :: DiffType -> Int -> Gen [Diff]
-genDiffs dt n = do
-    let tenthOfN = floor $ (realToFrac n) / 10
-    numValues <- choose (0, tenthOfN)
-    let lastValue = if (n > 0) then n - 1 else 0
-    values <- vectorOf numValues $ choose (0, lastValue)
-    counts <- vectorOf numValues $ choose (1, 5)
-    let vcs = zip values counts
-    let ds = map (\(v, c) -> Diff {diffType = dt, value = v, count = c}) vcs
-    let ds' = sortOn (\d -> (value d)) ds
-    return ds'
+genNumDiffs :: Gen Int
+genNumDiffs = frequency [(2, return 0), (98, choose (1, 10))]
 
 shrinkPropTestData :: PropTestData -> [PropTestData]
 shrinkPropTestData ptd = concatMap ($ ptd) [
@@ -60,10 +54,20 @@ shrinkSequenceLength ptd =
 
 isValidShrink ptd = isValid ptd && (not $ null $ allDiffs ptd)
 
+genDiff :: Gen Diff
+genDiff = do
+    dt <- elements [Duplicate, Missing]
+    v <- choose (0, 100)
+    c <- choose (1, 5)
+    return Diff {diffType = dt, value = v, count = c}
+
+shrinkDiff :: Diff -> [Diff]
+shrinkDiff d = if (count d > 1) then [d {count = count d - 1}] else []
+
 instance Arbitrary PropTestData where
     arbitrary = genPropTestData
     shrink = shrinkPropTestData
 
 instance Arbitrary Diff where
-    arbitrary = return Diff {diffType = Duplicate, value = 0, count = 0}
-    shrink = \d -> if (count d > 1) then [d {count = count d - 1}] else []
+    arbitrary = genDiff
+    shrink = shrinkDiff
