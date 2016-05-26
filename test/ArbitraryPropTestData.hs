@@ -21,10 +21,11 @@ genSequenceLength = choose (0, 100)
 genDiffs :: Gen ([Diff], [Diff])
 genDiffs = do
     numDiffs <- genNumDiffs
-    diffs <- vectorOf numDiffs genDiff
-    let ds = filter (\d -> diffType d == Duplicate) diffs
-    let ms = filter (\d -> diffType d == Missing) diffs
+    diffs <- vectorOf numDiffs arbitrary :: Gen [Diff]
+    let ds = filter (isDiffType Duplicate) diffs
+    let ms = filter (isDiffType Missing) diffs
     return (ds, ms)
+    where isDiffType dt d = diffType d == dt
 
 genNumDiffs :: Gen Int
 genNumDiffs = frequency [(2, return 0), (98, choose (1, 10))]
