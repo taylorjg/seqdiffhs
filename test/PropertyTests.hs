@@ -5,8 +5,13 @@ import SeqDiff
 import PropTestData
 import ArbitraryPropTestData
 
-prop_diffs :: PropTestData -> Bool
-prop_diffs ptd = diffs (toList ptd) == allDiffs ptd
+prop_diffs :: PropTestData -> Property
+prop_diffs ptd =
+    classify (and [null $ ds ptd, null $ ms ptd]) "No diffs" $
+    classify (and [null $ ds ptd, not $ null $ ms ptd]) "No 'duplicate' diffs" $
+    classify (and [null $ ms ptd, not $ null $ ds ptd]) "No 'missing' diffs" $
+    classify (len ptd == 0)  "Trivial" $
+    diffs (toList ptd) == allDiffs ptd
 
 main :: IO ()
 main = do
