@@ -21,7 +21,7 @@ genSequenceLength = choose (0, 100)
 genDiffs :: Gen ([Diff], [Diff])
 genDiffs = do
     numDiffs <- genNumDiffs
-    diffs <- vectorOf numDiffs arbitrary :: Gen [Diff]
+    diffs <- vectorOf numDiffs arbitrary
     let ds = filter (isDiffType Duplicate) diffs
     let ms = filter (isDiffType Missing) diffs
     return (ds, ms)
