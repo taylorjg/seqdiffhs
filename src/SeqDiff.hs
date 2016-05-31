@@ -12,24 +12,26 @@ instance Show Diff where
     show d = "(" ++ show (value d) ++ ", " ++ show (count d) ++ ")"
 
 diffs :: [Int] -> [Diff]
-diffs xs = loop xs 0 0
+diffs xs = loop xs 0 0 []
 
-loop :: [Int] -> Int -> Int -> [Diff]
-loop xs ev rc =
+loop :: [Int] -> Int -> Int -> [Diff] -> [Diff]
+loop xs ev rc acc =
     case xs of
-        v:vs | v == pred ev -> loop vs ev (succ rc)
+        v:vs | v == pred ev -> loop vs ev (succ rc) acc
         v:vs ->
             let
                 d1 = if rc > 0 then Just $ makeDuplicate (pred ev) rc else Nothing
                 d2 = if v > ev then Just $ makeMissing ev (v - ev) else Nothing
-                ds = loop vs (succ v) 0
+                ds = case (d1, d2) of
+                    (Just d1, Just d2) -> [d2, d1]
+                    (Just d1, Nothing) -> [d1]
+                    (Nothing, Just d2) -> [d2]
+                    (Nothing, Nothing) -> []
             in
-                case (d1, d2) of
-                    (Just d1, Just d2) -> d1 : d2 : ds
-                    (Just d1, Nothing) -> d1 : ds
-                    (Nothing, Just d2) -> d2 : ds
-                    (Nothing, Nothing) -> ds
-        [] -> [makeDuplicate (pred ev) rc | rc > 0]
+                loop vs (succ v) 0 (ds ++ acc)
+        [] ->
+            let acc' = if rc > 0 then (makeDuplicate (pred ev) rc):acc else acc
+            in reverse acc'
 
 makeDuplicate :: Int -> Int -> Diff
 makeDuplicate v c = Diff {diffType = Duplicate, value = v, count = c}

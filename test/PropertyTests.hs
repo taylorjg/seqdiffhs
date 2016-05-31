@@ -15,7 +15,7 @@ prop_diffs ptd =
 
 main :: IO ()
 main = do
-    let args = stdArgs {chatty = True, maxSuccess = 100}
+    let args = stdArgs {chatty = True, maxSuccess = 1000}
     let tests = [
             quickCheckWithResult args prop_diffs
             ]
