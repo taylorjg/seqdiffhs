@@ -17,21 +17,19 @@ diffs xs = loop xs 0 0 []
 loop :: [Int] -> Int -> Int -> [Diff] -> [Diff]
 loop xs ev rc acc =
     case xs of
-        v:vs | v == pred ev -> loop vs ev (succ rc) acc
+        v:vs | v == pred ev ->
+            loop vs ev (succ rc) acc
         v:vs ->
             let
-                d1 = if rc > 0 then Just $ makeDuplicate (pred ev) rc else Nothing
-                d2 = if v > ev then Just $ makeMissing ev (v - ev) else Nothing
-                ds = case (d1, d2) of
-                    (Just d1, Just d2) -> [d2, d1]
-                    (Just d1, Nothing) -> [d1]
-                    (Nothing, Just d2) -> [d2]
-                    (Nothing, Nothing) -> []
+                acc' = if rc > 0 then makeDuplicate (pred ev) rc:acc else acc
+                acc'' = if v > ev then makeMissing ev (v - ev):acc' else acc'
             in
-                loop vs (succ v) 0 (ds ++ acc)
+                loop vs (succ v) 0 acc''
         [] ->
-            let acc' = if rc > 0 then (makeDuplicate (pred ev) rc):acc else acc
-            in reverse acc'
+            let
+                acc' = if rc > 0 then (makeDuplicate (pred ev) rc):acc else acc
+            in
+                reverse acc'
 
 makeDuplicate :: Int -> Int -> Diff
 makeDuplicate v c = Diff {diffType = Duplicate, value = v, count = c}
