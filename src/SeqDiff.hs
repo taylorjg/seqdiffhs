@@ -15,21 +15,14 @@ diffs :: [Int] -> [Diff]
 diffs xs = loop xs 0 0 []
 
 loop :: [Int] -> Int -> Int -> [Diff] -> [Diff]
-loop xs ev rc acc =
+loop xs ev rc ds =
     case xs of
-        v:vs | v == pred ev ->
-            loop vs ev (succ rc) acc
-        v:vs ->
-            let
-                acc' = if rc > 0 then makeDuplicate (pred ev) rc:acc else acc
-                acc'' = if v > ev then makeMissing ev (v - ev):acc' else acc'
-            in
-                loop vs (succ v) 0 acc''
-        [] ->
-            let
-                acc' = if rc > 0 then (makeDuplicate (pred ev) rc):acc else acc
-            in
-                reverse acc'
+        v:vs | v == pred ev -> loop vs ev (succ rc) ds
+        v:vs -> loop vs (succ v) 0 ds''
+            where
+            ds' = ds ++ [makeDuplicate (pred ev) rc | rc > 0]
+            ds'' = ds' ++ [makeMissing ev (v - ev) | v > ev]
+        [] -> ds ++ [makeDuplicate (pred ev) rc | rc > 0]
 
 makeDuplicate :: Int -> Int -> Diff
 makeDuplicate v c = Diff {diffType = Duplicate, value = v, count = c}
